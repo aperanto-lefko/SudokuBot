@@ -16,16 +16,17 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-       <telegram.bots.version>6.9.7.0</telegram.bots.version>
+
         <lombok.version>1.18.42</lombok.version>
         <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
+        <version>3.3.0</version>
         <relativePath/>
     </parent>
 
@@ -44,11 +45,6 @@
         </dependency>
 
         <!-- Telegram Bot API -->
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-spring-boot-starter</artifactId>
-            <version>${telegram.bots.version}</version>
-        </dependency>
 
 
 

@@ -11,7 +11,7 @@ spring:
       server:
         native:
           search-locations:
-            - classpath:config/{application}
+            - classpath:config/core/{application}
             - classpath:config/infra/{application}
 
 eureka:
