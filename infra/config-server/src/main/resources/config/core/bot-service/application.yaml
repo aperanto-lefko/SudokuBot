@@ -1,0 +1,6 @@
+logging:
+  level:
+    org.springframework.security: DEBUG
+telegram:
+  bot:
+    username: sudoku_brain_bot
