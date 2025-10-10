@@ -11,6 +11,7 @@ import java.util.List;
 
 @Component
 public class SudokuUIHelper {
+
     public SendMessage buildBoardMessage(long chatId, SudokuCell[][] board) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         int size = board.length;
@@ -22,15 +23,16 @@ public class SudokuUIHelper {
 
                 if (cell.isFixed()) {
                     // фиксированные числа: замок, не интерактивные
-                    btn.setText(cell.getValue() + "🔒");
+                    btn.setText(cell.getValue() + "");
                     btn.setCallbackData("LOCKED");
                 } else {
                     // пустая клетка или пользовательское число: интерактивные
-                    btn.setText(cell.getValue() == 0 ? "·" : String.valueOf(cell.getValue()));
+                    btn.setText(cell.getValue() == 0 ? "❓" : String.valueOf(cell.getValue() + ".1"));
                     btn.setCallbackData("CELL_" + r + "_" + c);
                 }
 
                 row.add(btn);
+
             }
             rows.add(row);
         }
