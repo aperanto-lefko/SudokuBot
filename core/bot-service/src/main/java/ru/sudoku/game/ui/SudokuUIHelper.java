@@ -27,7 +27,7 @@ public class SudokuUIHelper {
                     btn.setCallbackData("LOCKED");
                 } else {
                     // пустая клетка или пользовательское число: интерактивные
-                    btn.setText(cell.getValue() == 0 ? "❓" : String.valueOf(cell.getValue() + ".1"));
+                    btn.setText(cell.getValue() == 0 ? "❓" : String.valueOf(cell.getValue() + "."));
                     btn.setCallbackData("CELL_" + r + "_" + c);
                 }
 
@@ -86,5 +86,29 @@ public class SudokuUIHelper {
         msg.setText("Выберите число для клетки [" + (row + 1) + "," + (col + 1) + "]");
         msg.setReplyMarkup(markup);
         return msg;
+    }
+    public SendMessage buildDifficultySelection(long chatId) {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> line1 = new ArrayList<>();
+        line1.add(button("🟢 Легкий", "DIFFICULTY_EASY"));
+        line1.add(button("🟡 Средний", "DIFFICULTY_MEDIUM"));
+        line1.add(button("🔴 Сложный", "DIFFICULTY_HARD"));
+        rows.add(line1);
+
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup(rows);
+
+        SendMessage msg = new SendMessage();
+        msg.setChatId(String.valueOf(chatId));
+        msg.setText("Выберите уровень сложности Sudoku:");
+        msg.setReplyMarkup(markup);
+        return msg;
+    }
+
+    private InlineKeyboardButton button(String text, String callback) {
+        InlineKeyboardButton btn = new InlineKeyboardButton();
+        btn.setText(text);
+        btn.setCallbackData(callback);
+        return btn;
     }
 }

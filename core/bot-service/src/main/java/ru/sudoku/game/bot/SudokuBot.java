@@ -33,8 +33,9 @@ public class SudokuBot extends TelegramLongPollingBot {
             String text = update.getMessage().getText();
 
             if ("/start".equalsIgnoreCase(text)) {
-                SudokuCell[][] board = gameService.newGame(chatId);
-                SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
+                SendMessage msg = uiHelper.buildDifficultySelection(chatId);
+//                SudokuCell[][] board = gameService.newGame(chatId);
+//                SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
                 executeSafe(msg);
             } else {
                 executeSafe(SendMessage.builder()
@@ -53,19 +54,39 @@ public class SudokuBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
     private void handleCallback(CallbackQuery query) {
         String data = query.getData();
         long chatId = query.getMessage().getChatId();
+        if (data.startsWith("DIFFICULTY_")) {
+            String level = data.substring("DIFFICULTY_".length());
+            int blanks;
 
-        if (data.startsWith("CELL_")) {
+            switch (level) {
+                case "EASY":
+                    blanks = 3;
+                    break;
+                case "MEDIUM":
+                    blanks = 6;
+                    break;
+                case "HARD":
+                    blanks = 8;
+                    break;
+                default:
+                    blanks = 4;
+            }
+
+            SudokuCell[][] board = gameService.newGame(chatId, blanks);
+            SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
+            executeSafe(msg);
+        } else if (data.startsWith("CELL_")) {
             String[] parts = data.split("_");
             int r = Integer.parseInt(parts[1]);
             int c = Integer.parseInt(parts[2]);
 
             SendMessage msg = uiHelper.buildNumberSelection(chatId, r, c);
             executeSafe(msg);
-        }
-        else if (data.startsWith("VALUE_")) {
+        } else if (data.startsWith("VALUE_")) {
             String[] parts = data.split("_");
             int row = Integer.parseInt(parts[1]);
             int col = Integer.parseInt(parts[2]);
@@ -89,14 +110,12 @@ public class SudokuBot extends TelegramLongPollingBot {
                             .build());
                 }
             }
-        }
-        else if ("CANCEL".equals(data)) {
+        } else if ("CANCEL".equals(data)) {
             SudokuCell[][] board = gameService.getBoard(chatId);
             SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
             executeSafe(msg);
         }
     }
-
 
 
     @Override

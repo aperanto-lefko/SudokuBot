@@ -28,6 +28,20 @@ public class GameService {
         games.put(chatId, cells);
         return cells;
     }
+    public SudokuCell[][] newGame(long chatId, int blanks) {
+        int[][] board = generator.generate(blanks);
+        SudokuCell[][] cells = new SudokuCell[4][4];
+
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                int value = board[r][c];
+                cells[r][c] = new SudokuCell(value, value != 0);
+            }
+        }
+
+        games.put(chatId, cells);
+        return cells;
+    }
 
     public SudokuCell[][] getBoard(long chatId) {
         return games.get(chatId);
