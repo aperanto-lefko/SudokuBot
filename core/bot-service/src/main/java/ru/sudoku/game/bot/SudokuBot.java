@@ -34,13 +34,17 @@ public class SudokuBot extends TelegramLongPollingBot {
 
             if ("/start".equalsIgnoreCase(text)) {
                 SendMessage msg = uiHelper.buildDifficultySelection(chatId);
-//                SudokuCell[][] board = gameService.newGame(chatId);
-//                SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
                 executeSafe(msg);
+            } else if ("/rules".equalsIgnoreCase(text)) {
+                String rulesText = getRules();
+                executeSafe(SendMessage.builder()
+                        .chatId(chatId)
+                        .text(rulesText)
+                        .build());
             } else {
                 executeSafe(SendMessage.builder()
                         .chatId(chatId)
-                        .text("Напиши /start чтобы начать новую игру")
+                        .text("Напиши /start чтобы начать новую игру\n/rules- показать правила игры")
                         .build());
             }
         }
@@ -103,6 +107,7 @@ public class SudokuBot extends TelegramLongPollingBot {
                             .chatId(chatId)
                             .text("Поздравляем! Sudoku решено правильно 🎉")
                             .build());
+
                 } else {
                     executeSafe(SendMessage.builder()
                             .chatId(chatId)
@@ -117,6 +122,18 @@ public class SudokuBot extends TelegramLongPollingBot {
         }
     }
 
+    private String getRules() {
+        return "📋 Правила игры Sudoku 4x4:\n\n" +
+                "• Заполните сетку 4x4 числами от 1 до 4 \n" +
+                "• В каждой строке должны быть все числа от 1 до 4 без повторений\n" +
+                "• В каждом столбце должны быть все числа от 1 до 4 без повторений\n" +
+                "• В каждом блоке 2x2 должны быть все числа от 1 до 4 без повторений\n\n" +
+                "✏️ Как играть:\n" +
+                "• Нажмите на клетку со знаком ❓ чтобы выбрать число\n" +
+                "• Используйте кнопку 🧹 стереть для очистки клетки\n" +
+                "• Используйте кнопку ↩️ отмена для отмены действия\n" +
+                "• Цифры с точкой можно изменять, без точки изменять нельзя";
+    }
 
     @Override
     public String getBotUsername() {
@@ -128,4 +145,6 @@ public class SudokuBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return botToken;
     }
+
+
 }
