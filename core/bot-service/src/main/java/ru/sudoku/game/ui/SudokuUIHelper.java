@@ -84,7 +84,6 @@ public class SudokuUIHelper {
             btn.setCallbackData("VALUE_" + row + "_" + col + "_" + num);
             singleRow.add(btn);
         }
-
         // стереть
         InlineKeyboardButton erase = new InlineKeyboardButton();
         erase.setText("🧹");
