@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.sudoku.game.dto.SudokuCellDto;
 import ru.sudoku.game.model.SudokuCell;
 
 import java.util.ArrayList;
@@ -23,13 +24,13 @@ public class SudokuUIHelper {
      *          - Изменяемые ячейки отображаются с точкой после числа или "❓" для пустых ячеек
      *          - Каждая изменяемая ячейка является кнопкой с callback данными в формате "CELL_X_Y"
      */
-    public SendMessage buildBoardMessage(long chatId, SudokuCell[][] board) {
+    public SendMessage buildBoardMessage(long chatId, SudokuCellDto[][] board) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         int size = board.length;
         for (int r = 0; r < size; r++) {
             List<InlineKeyboardButton> row = new ArrayList<>();
             for (int c = 0; c < size; c++) {
-                SudokuCell cell = board[r][c];
+                SudokuCellDto cell = board[r][c];
                 InlineKeyboardButton btn = new InlineKeyboardButton();
 
                 if (cell.isFixed()) {

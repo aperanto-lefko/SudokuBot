@@ -1,0 +1,95 @@
+services:
+
+  game-db:
+    image: postgres:16.1
+    container_name: game-db
+    ports:
+      - "5436:5432"
+    environment:
+      - POSTGRES_DB=game-db
+      - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=game
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 10s
+      interval: 10s
+      retries: 15
+    networks:
+      - microservices-net
+
+  discovery-server:
+    build:
+      context: .
+      dockerfile: infra/discovery_server/Dockerfile
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-net
+
+  config-server:
+    build:
+      context: .
+      dockerfile: infra/config-server/Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    networks:
+      - microservices-net
+
+  sudoku-service:
+    build:
+      context: .
+      dockerfile: core/sudoku-service/Dockerfile
+    container_name: sudoku-service
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      config-server:
+        condition: service_healthy
+      game-db:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    networks:
+      - microservices-net
+
+  bot-service:
+    build:
+      context: .
+      dockerfile: core/bot-service/Dockerfile
+    container_name: bot-service
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      config-server:
+        condition: service_healthy
+      game-db:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    networks:
+      - microservices-net
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#    dns:
+#      - 8.8.8.8
+#      - 1.1.1.1
+networks:
+  microservices-net:
+    driver: bridge
