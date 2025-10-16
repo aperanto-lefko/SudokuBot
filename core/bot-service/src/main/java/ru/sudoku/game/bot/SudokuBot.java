@@ -25,7 +25,8 @@ public class SudokuBot extends TelegramLongPollingBot {
     final SudokuUIHelper uiHelper;
     @Value("${telegram.bot.username}")
     String botUserName;
-    final String botToken = System.getenv("TELEGRAM_SUDOKU_BOT_TOKEN");
+    @Value("${telegram.bot.token}")
+    String botToken;
 
     @Override
     public void onUpdateReceived(Update update) {

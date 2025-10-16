@@ -1,3 +1,5 @@
 telegram:
   bot:
-    username: sudoku_brain_bot
+    token: ${TELEGRAM_BOT_TOKEN}
+    username: ${TELEGRAM_BOT_USERNAME}
+
