@@ -1,9 +1,9 @@
 <configuration>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/bot-service.log</file>
+        <file>logs/sudoku-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- архивировать каждый день -->
-            <fileNamePattern>logs/bot-service-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>logs/sudoku-service-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>7</maxHistory> <!-- хранить 7 дней -->
             <totalSizeCap>100MB</totalSizeCap>

@@ -3,6 +3,7 @@ package ru.sudoku.game.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.sudoku.game.dto.SudokuCellDto;
 import ru.sudoku.game.exception.BoardNotFoundException;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class GameService {
 
     SudokuGenerator generator;
@@ -37,6 +39,7 @@ public class GameService {
      * @return двумерный массив {@link SudokuCell} размером 4x4, представляющий новую игру
      */
     public SudokuCellDto[][] newGame(long chatId, int blanks) {
+        log.info("Создание новой игры для пользователя: {}, количество пустых ячеек: {}", chatId, blanks);
         int[][] board = generator.generate(blanks);
         SudokuCell[][] cells = new SudokuCell[4][4];
 
@@ -47,40 +50,49 @@ public class GameService {
             }
         }
         games.put(chatId, cells);
+        log.info("Новая игра успешно создана для пользователя: {}", chatId);
         return sudokuCellMapper.toDto(cells);
     }
+
     /**
      * Возвращает текущую доску Судоку для пользователя с заданным идентификатором.
      *
      * @param chatId уникальный идентификатор пользователя
      * @return двумерный массив {@link SudokuCell} размером 4x4, представляющий текущее состояние игры,
-     *         или {@code null}, если игра для данного пользователя не существует
+     * или {@code null}, если игра для данного пользователя не существует
      */
     public SudokuCellDto[][] getBoard(long chatId) {
+        log.info("Запрос доски для пользователя: {}", chatId);
         SudokuCell[][] board = games.get(chatId);
         if (board == null) {
             throw new BoardNotFoundException(chatId);
         }
+        log.info("Доска успешно получена для пользователя: {}", chatId);
         return sudokuCellMapper.toDto(board);
     }
+
     /**
      * Устанавливает значение ячейки на доске Судоку для конкретного пользователя,
      * если эта ячейка не является фиксированной (сгенерированной автоматически).
      *
      * @param chatId уникальный идентификатор пользователя
-     * @param row индекс строки (0–3) ячейки, которую нужно изменить
-     * @param col индекс столбца (0–3) ячейки, которую нужно изменить
-     * @param value новое значение для ячейки
+     * @param row    индекс строки (0–3) ячейки, которую нужно изменить
+     * @param col    индекс столбца (0–3) ячейки, которую нужно изменить
+     * @param value  новое значение для ячейки
      *
-     * <p>Если доска для пользователя не существует или выбранная ячейка фиксирована,
-     * метод ничего не делает.</p>
+     *               <p>Если доска для пользователя не существует или выбранная ячейка фиксирована,
+     *               метод ничего не делает.</p>
      */
     public void setCell(long chatId, int row, int col, int value) {
+        log.info("Установка значения ячейки [{}][{}] = {} для пользователя: {}", row, col, value, chatId);
         SudokuCell[][] board = games.get(chatId);
         if (board != null && !board[row][col].isFixed()) {
             board[row][col].setValue(value);
+            log.info("Значение ячейки [{}][{}] успешно установлено в {} для пользователя: {}",
+                    row, col, value, chatId);
         }
     }
+
     /**
      * Проверяет, решена ли доска Судоку для конкретного пользователя.
      *
@@ -96,8 +108,12 @@ public class GameService {
      * @return {@code true}, если доска полностью и корректно решена, {@code false} в противном случае
      */
     public boolean isSolved(long chatId) {
+        log.info("Проверка решения для пользователя: {}", chatId);
         SudokuCell[][] board = games.get(chatId);
-        if (board == null) return false;
+        if (board == null) {
+            log.warn("Попытка проверить решение для несуществующей доски пользователя: {}", chatId);
+            return false;
+        }
 
         int size = 4;
         int blockSize = 2;
@@ -113,13 +129,16 @@ public class GameService {
                 int colVal = board[j][i].getValue();
                 // Проверка, что число в допустимом диапазоне 1..size
                 if ((rowVal < 1) || (rowVal > size) || (colVal < 1) || (colVal > size)) {
+                    log.info("Некорректное значение в ячейке: строка={}, столбец={}, значение={}", i, j, rowVal);
                     return false;
                 }
                 // Проверяем, встречалось ли это число ранее в строке или столбце
                 if (rowCheck[rowVal]) { // число уже встречалось в строке
+                    log.info("Обнаружен дубликат в строке {}: значение {}", i, rowVal);
                     return false;
                 }
                 if (colCheck[colVal]) { // число уже встречалось в столбце
+                    log.info("Обнаружен дубликат в столбце {}: значение {}", i, colVal);
                     return false;
                 }
 // Отмечаем число как встреченное
@@ -138,6 +157,7 @@ public class GameService {
                         int val = board[blockRow + r][blockCol + c].getValue();
                         // Если число уже встречалось в блоке — доска неверна
                         if (blockCheck[val]) {
+                            log.info("Обнаружен дубликат в блоке [{},{}]: значение {}", blockRow, blockCol, val);
                             return false;
                         }
                         // Отмечаем число как встреченное
@@ -146,10 +166,12 @@ public class GameService {
                 }
             }
         }
+        log.info("Доска успешно решена для пользователя: {}", chatId);
 // Если все проверки прошли успешно — доска заполнена правильно
         return true;
     }
 //Проверка все ли поля заполнены
+
     /**
      * Проверяет, полностью ли заполнена доска Судоку для конкретного пользователя.
      *
@@ -161,15 +183,21 @@ public class GameService {
      * @return {@code true}, если все ячейки доски заполнены, {@code false} если есть пустые ячейки
      */
     public boolean isBoardFull(long chatId) {
+        log.info("Проверка заполненности доски для пользователя: {}", chatId);
         SudokuCell[][] board = games.get(chatId);
-        if (board == null) return false;
+        if (board == null) {
+            log.warn("Попытка проверить заполненность несуществующей доски пользователя: {}", chatId);
+            return false;
+        }
         for (int r = 0; r < board.length; r++) {
             for (int c = 0; c < board[r].length; c++) {
                 if (board[r][c].getValue() == 0) {
+                    log.info("Найдена пустая ячейка [{}][{}] для пользователя: {}", r, c, chatId);
                     return false; // есть пустая клетка
                 }
             }
         }
+        log.info("Доска полностью заполнена для пользователя: {}", chatId);
         return true; // все клетки заполнены
     }
 

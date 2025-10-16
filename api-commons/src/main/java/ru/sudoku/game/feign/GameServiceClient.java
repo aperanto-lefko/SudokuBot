@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.sudoku.game.dto.SudokuCellDto;
 
-@FeignClient(name = "game-service")
+@FeignClient(name = "sudoku-service")
 public interface GameServiceClient {
     @PostMapping("/games/new")
     SudokuCellDto[][] newGame(@RequestParam long chatId, @RequestParam int blanks);

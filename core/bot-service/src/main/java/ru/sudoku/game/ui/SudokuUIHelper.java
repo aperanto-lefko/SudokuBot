@@ -114,9 +114,9 @@ public class SudokuUIHelper {
      * @return готовое сообщение SendMessage с клавиатурой выбора сложности
      *
      * @apiNote Метод предоставляет три уровня сложности:
-     *          - 🟢 Легкий (DIFFICULTY_EASY)
-     *          - 🟡 Средний (DIFFICULTY_MEDIUM)
-     *          - 🔴 Сложный (DIFFICULTY_HARD)
+     *          -  Легкий (DIFFICULTY_EASY)
+     *          -  Средний (DIFFICULTY_MEDIUM)
+     *          -  Сложный (DIFFICULTY_HARD)
      *          Все кнопки расположены в одной строке для компактного отображения
      */
     public SendMessage buildDifficultySelection(long chatId) {
