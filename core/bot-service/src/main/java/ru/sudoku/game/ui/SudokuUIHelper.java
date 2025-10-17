@@ -77,7 +77,6 @@ public class SudokuUIHelper {
 
         // одна строка со всеми кнопками: цифры 1-4, стереть, отмена
         List<InlineKeyboardButton> singleRow = new ArrayList<>();
-
         // цифры 1-4
         for (int num = 1; num <= 4; num++) {
             InlineKeyboardButton btn = new InlineKeyboardButton();
