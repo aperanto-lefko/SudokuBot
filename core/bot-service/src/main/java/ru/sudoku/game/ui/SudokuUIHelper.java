@@ -157,19 +157,25 @@ public class SudokuUIHelper {
     public SendMessage buildStartButtonMessage(long chatId) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        // Ряд с кнопкой "Новая игра"
-        List<InlineKeyboardButton> newGameRow = new ArrayList<>();
+        // Один ряд с двумя кнопками рядом
+        List<InlineKeyboardButton> buttonRow = new ArrayList<>();
+
         InlineKeyboardButton newGameButton = new InlineKeyboardButton();
-        newGameButton.setText("\uD83C\uDFAE Новая игра");
+        newGameButton.setText("🎮 Новая игра");
         newGameButton.setCallbackData("NEW_GAME");
-        newGameRow.add(newGameButton);
-        rows.add(newGameRow);
+        buttonRow.add(newGameButton);
+
+        InlineKeyboardButton rulesButton = new InlineKeyboardButton();
+        rulesButton.setText("📋 Правила");
+        rulesButton.setCallbackData("SHOW_RULES");
+        buttonRow.add(rulesButton);
+
+        rows.add(buttonRow);
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup(rows);
 
         SendMessage msg = new SendMessage();
         msg.setChatId(String.valueOf(chatId));
-        msg.setText("Хотите начать новую игру?");
         msg.setReplyMarkup(markup);
         return msg;
     }
