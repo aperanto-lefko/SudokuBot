@@ -108,6 +108,8 @@ public class SudokuBot extends TelegramLongPollingBot {
                     if (gameServiceclient.isSolved(chatId)) {
                         log.info("Пользователь {} успешно решил судоку!", chatId);
                         sendText(chatId, "Поздравляем! Sudoku решено правильно 🎉");
+                        SendMessage startButtonMessage = uiHelper.buildStartButtonMessage(chatId);
+                        executeSafe(startButtonMessage);
                     } else {
                         log.info(" Пользователь {} заполнил судоку неверно", chatId);
                         sendText(chatId, "Все клетки заполнены, но решение неверное ❌");
@@ -118,6 +120,12 @@ public class SudokuBot extends TelegramLongPollingBot {
                 SudokuCellDto[][] board = gameServiceclient.getBoard(chatId);
                 SendMessage msg = uiHelper.buildBoardMessage(chatId, board);
                 executeSafe(msg);
+            }
+            else if ("NEW_GAME".equals(data)) {
+                log.info("Пользователь {} начал новую игру через кнопку", chatId);
+                SendMessage msg = uiHelper.buildDifficultySelection(chatId);
+                executeSafe(msg);
+                return;
             }
         } catch (FeignException.NotFound ex) {
             log.warn("Игра не найдена для пользователя {}: {}", chatId, ex.getMessage());
